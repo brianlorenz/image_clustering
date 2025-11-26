@@ -1,5 +1,5 @@
 from sklearn.mixture import GaussianMixture
-from cluster_algorithms.normalize import normalize_X
+from helper_functions.normalize import normalize_X
 from sklearn.model_selection import GridSearchCV
 import pandas as pd
 import matplotlib.pyplot as plt

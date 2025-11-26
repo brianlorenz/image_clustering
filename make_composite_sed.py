@@ -10,24 +10,28 @@ from matplotlib import colors
 from scipy import interpolate
 import initialize_mosdef_dirs as imd
 from plot_vals import *
-from helpers import delete_bad_values
-from cluster_algorithms.cross_cor_eqns import get_cross_cor
+from helper_functions.helpers import delete_bad_values
+from helper_functions.cross_cor_eqns import get_cross_cor
 
 def get_composite_sed_save_path(cluster_method, norm_method='', distances='', id_dr3=-1):
+    """Location to save the composite SEDs"""
     save_path = composite_sed_save_dir + f'{cluster_method}{norm_method}{distances}/'
     if id_dr3 >= 0:
         save_path = composite_sed_save_dir + f'{cluster_method}{norm_method}{distances}/{id_dr3}_composite_seds.csv'
     return save_path
 
 def get_composite_image_save_path(cluster_method, norm_method='', distances='', id_dr3=-1, value=-1):
+    """Location to save the plots of the composites"""
     check_and_make_dir(composite_image_save_dir + f'{cluster_method}{norm_method}{distances}/')
     save_path = composite_image_save_dir + f'{cluster_method}{norm_method}{distances}/{id_dr3}_composite_sed_{value}.pdf'
     return save_path
 
 def get_composite_sed(id_dr3_list, cluster_method, norm_method='', distances='distances', run_filters=False):
+    """Make composite SEDs. The parameters specify where to read the clustering info from"""
     plot_indiv = False
     
     for id_dr3 in id_dr3_list:
+        # Read in the pixels and the clustering labels
         pixel_data = read_saved_pixels(id_dr3)
         cluster_savepath = get_cluster_save_path(cluster_method, norm_method=norm_method, distances=distances, id_dr3=id_dr3)
         clustered_data = np.load(cluster_savepath)
@@ -51,23 +55,29 @@ def get_composite_sed(id_dr3_list, cluster_method, norm_method='', distances='di
         # Figure setup
         fig, axs = plt.subplots(len(unique_values), 3, figsize=(15, 5 * len(unique_values)))
 
+        # Loop through each clustering ID
         for row, value in enumerate(unique_values):
             pixel_idxs = np.where(cluster_values == value)[0]
             cluster_pixels = pixel_seds.T[pixel_idxs]
             pixel_locations = masked_indicies[:, pixel_idxs]
             
+            # Arbitrarily pick a target pixel - here we are taking the brightest one
             target_pixel = cluster_pixels[np.argmax(np.sum(cluster_pixels, axis=1))]
 
+            # Normalize all pixles to the target
             normalized_pixels = np.apply_along_axis(normalize_pixels, 1, cluster_pixels, target_pixel=target_pixel)
 
+            # Make a composite as the mean of all the normalized pixels
             composite_sed = np.mean(normalized_pixels, axis=0)
             composite_df[f'composite_sed_group{value}'] = composite_sed
 
+            # Saving and plotting
             save_info = [cluster_method, norm_method, distances]
             if plot_indiv:
                 vis_composite_sed(id_dr3, value, waves, normalized_pixels, pixel_locations, composite_sed, save_info)     
             vis_composite_sed(id_dr3, value, waves, normalized_pixels, pixel_locations, composite_sed, save_info, axarr=axs[row, :])     
 
+        # Save the composite
         composite_sed_dir = get_composite_sed_save_path(cluster_method=cluster_method, norm_method=norm_method, distances=distances)
         check_and_make_dir(composite_sed_dir)
         composite_sed_path = get_composite_sed_save_path(cluster_method=cluster_method, norm_method=norm_method, distances=distances, id_dr3=id_dr3)
@@ -82,6 +92,7 @@ def get_composite_sed(id_dr3_list, cluster_method, norm_method='', distances='di
     return
 
 def normalize_pixels(pixel, target_pixel):
+    """Uses cross correlation to compute how to normalize each pixel to a target"""
     norm_factor = get_cross_cor(target_pixel, pixel)[0]
 
     if norm_factor < 0:
@@ -92,6 +103,7 @@ def normalize_pixels(pixel, target_pixel):
     return norm_pixel
 
 def vis_composite_sed(id_dr3, value, waves, normalized_pixels, pixel_locations, composite_sed, save_info, axarr=['']):
+    """Composite SED plotting"""
     image_filter = 'f444w'
     cluster_method, norm_method, distances = save_info
     
@@ -160,6 +172,7 @@ def vis_composite_sed(id_dr3, value, waves, normalized_pixels, pixel_locations, 
 
 
 def plot_similarity_cluster(value, normalized_pixels, composite_sed, ax):
+    """Plots a similarity figure, which uses cross-correlation to show how similar eachpixel is to the composite"""
     axisfont=14
     ticksize=12
 
@@ -190,6 +203,7 @@ def plot_similarity_cluster(value, normalized_pixels, composite_sed, ax):
    
 
 def scale_aspect(ax):
+    """Makes plot a square"""
     ylims = ax.get_ylim()
     xlims = ax.get_xlim()
     ydiff = np.abs(ylims[1]-ylims[0])

@@ -1,7 +1,7 @@
 import time
 import numpy as np
 from itertools import combinations_with_replacement
-from cluster_algorithms.cross_cor_eqns import get_cross_cor
+from helper_functions.cross_cor_eqns import get_cross_cor
 import matplotlib.pyplot as plt
 
 

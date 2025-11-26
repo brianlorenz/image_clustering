@@ -1,7 +1,7 @@
 
 from sklearn.cluster import SpectralClustering
 import numpy as np
-from cluster_algorithms.normalize import normalize_X
+from helper_functions.normalize import normalize_X
 from sklearn.neighbors import NearestNeighbors
 from matplotlib import pyplot as plt
 

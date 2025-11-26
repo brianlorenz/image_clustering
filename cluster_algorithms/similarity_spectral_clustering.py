@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.cluster import SpectralClustering
-from cluster_algorithms.similarity_matrix import find_sim_matrix
+from helper_functions.similarity_matrix import find_sim_matrix
 
 def spectral_cluster_cross_cor(pixel_seds, *args):
     X = pixel_seds.T

@@ -7,6 +7,7 @@ import time
 
 
 def plot_cluster_summary(id_dr3_list, cluster_method, norm_method='', distances='distances'):
+    """Makes a plot that shoulds the clusters made by cluster_seds.py"""
     image_filter = 'f444w'
     for id_dr3 in id_dr3_list:
         pixel_data = read_saved_pixels(id_dr3)
@@ -32,8 +33,6 @@ def plot_cluster_summary(id_dr3_list, cluster_method, norm_method='', distances=
         cmap_cluster, cmap_cluster_black = generate_cluster_cmap(len(unique_values)-1)
         masked_clustered = np.ma.masked_where(clustered_image == 0, clustered_image)
         
-
-
         # plotting
         ax_image.imshow(image_cutouts[image_filter_idx], cmap='gray', origin='lower')
         ax_clustered.imshow(clustered_image, cmap=cmap_cluster_black, origin='lower')
@@ -51,8 +50,9 @@ def plot_cluster_summary(id_dr3_list, cluster_method, norm_method='', distances=
 
 
 def plot_cutout_overview(id_dr3_list):
+    """Overview plot of which pixels were selected for clustering and showing the galaxy in all filters"""
     for id_dr3 in id_dr3_list:
-        pixel_data = read_saved_pixels(id_dr3)
+        pixel_data = read_saved_pixels(id_dr3) # Reads the outputs from prepare_images()
         image_cutouts = pixel_data['image_cutouts'] # shape of (n_images, cutout_y_size, cutout_x_size)
         noise_cutouts = pixel_data['noise_cutouts'] # shape of (n_images, cutout_y_size, cutout_x_size)
         boolean_segmap = pixel_data['boolean_segmap'] # shape of (cutout_y_size, cutout_x_size)
@@ -69,13 +69,13 @@ def plot_cutout_overview(id_dr3_list):
         fig, axarr = plt.subplots(n_rows, n_cols, figsize=(4*n_cols,4*n_rows))
                 
         # Show the segmap in last spot
-        ax_segmap = axarr[n_rows-1, n_cols-1] # store the segmap in the last one
+        ax_segmap = axarr[n_rows-1, n_cols-1]
         unique_segmap_ids, indexed_segmap = np.unique(obj_segmap, return_inverse=True)
         cmap = create_cmap_segmap(id_dr3, unique_segmap_ids)
         ax_segmap.imshow(indexed_segmap, cmap=cmap, origin='lower')
         add_textbox(ax_segmap, 'Segmap')
 
-        # Show an SNR map in spot before it
+        # Show an SNR map in second to last spot
         ax_snr = axarr[n_rows-1, n_cols-2]
         median_snr = np.median(image_cutouts/noise_cutouts, axis=0)
         snr_masked = median_snr > snr_thresh # SNR thresh defined above
@@ -83,8 +83,6 @@ def plot_cutout_overview(id_dr3_list):
         ax_snr.imshow(snr_masked, cmap=cmap_snr, origin='lower')
         add_textbox(ax_snr, f'SNR > {snr_thresh}')
 
-        
-            
         # Show all images
         for i in range(n_rows):
             for j in range(n_cols):
@@ -98,16 +96,14 @@ def plot_cutout_overview(id_dr3_list):
                 ax.axis('off')
                 if array_index >= len(filter_names):
                     continue
-                
-                
+                  
                 add_textbox(ax, filter_names[array_index].upper(), color=text_color)
                 image_data = image_cutouts[array_index, :, :]
                 ax.imshow(image_data, cmap='gray', origin='lower')
 
-                # ax.imshow(mask, cmap='Greys', origin='lower', alpha=0.5)
-                ax.contour(mask, levels=[0.5], colors='cornflowerblue', linewidths=2)
+                # ax.imshow(mask, cmap='Greys', origin='lower', alpha=0.5) # shows the full mask, but covers the image
+                ax.contour(mask, levels=[0.5], colors='cornflowerblue', linewidths=2) # contours the mask
         
-
         plt.tight_layout()
         fig.savefig(image_save_dir+f'overviews/{id_dr3}_overview.pdf')
     pass
@@ -147,7 +143,9 @@ def add_textbox(ax, text, color='white'):
     text_start = 0.035
     ax.text(text_start, text_height, text, fontsize=24, transform=ax.transAxes, color='black', bbox=dict(facecolor=color, alpha=0.8, boxstyle='round'))
 
-
+# Example usage
 if __name__ == '__main__':
-    plot_cluster_summary([46339, 44283, 30804], cluster_method='kmeans')
-    # plot_cutout_overview([46339, 44283, 30804])
+    plot_cutout_overview([46339, 44283, 30804]) # Overview plot, just needs prepare_images() ran
+    
+    plot_cluster_summary([46339, 44283, 30804], cluster_method='kmeans') # Shows result of clustering, needs the full pipeline
+    

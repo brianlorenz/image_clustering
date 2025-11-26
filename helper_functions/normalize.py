@@ -1,5 +1,5 @@
 import numpy as np
-from cluster_algorithms.cross_cor_eqns import get_cross_cor
+from helper_functions.cross_cor_eqns import get_cross_cor
 
 
 def normalize_X(X, norm_method='L2', sed='None'):
@@ -12,7 +12,6 @@ def normalize_X(X, norm_method='L2', sed='None'):
         X = cross_cor_norm(X, sed)
     
     return X
-    
 
 def L2_norm(X):
     l2_norms = np.sqrt(np.sum(X**2, axis=1))

@@ -1,7 +1,7 @@
 from sklearn.cluster import DBSCAN
 import numpy as np
-from cluster_algorithms.normalize import normalize_X
-from cluster_algorithms.similarity_matrix import distance_matrix, find_sim_matrix
+from helper_functions.normalize import normalize_X
+from helper_functions.distances import get_distance_metric
 from sklearn.neighbors import NearestNeighbors
 from matplotlib import pyplot as plt
 
@@ -11,17 +11,7 @@ def dbscan_clustering(pixel_seds, sed, waves, *args, norm_method='', distances='
 
     X = normalize_X(X, norm_method=norm_method, sed=sed)
 
-
-    if distances=='_weightednorm':
-        X = distance_matrix(X, waves)
-        metric = 'precomputed'
-    elif distances == '_crosscor':
-        X = find_sim_matrix(X)
-        X = 1-X
-        metric = 'precomputed'
-    else:
-        metric = 'euclidean'
-
+    X, metric, _ = get_distance_metric(X, distances, waves)
 
     min_samples = 5
     neighbors = NearestNeighbors(n_neighbors=min_samples)

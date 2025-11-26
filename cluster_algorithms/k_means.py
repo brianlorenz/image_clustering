@@ -1,10 +1,10 @@
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_samples, silhouette_score
-from cluster_algorithms.cross_cor_eqns import get_cross_cor
-from cluster_algorithms.similarity_matrix import distance_matrix
+from helper_functions.cross_cor_eqns import get_cross_cor
+from helper_functions.similarity_matrix import distance_matrix
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from cluster_algorithms.normalize import normalize_X
+from helper_functions.normalize import normalize_X
 import time
 import numpy as np
 

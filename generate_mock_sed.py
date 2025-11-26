@@ -1,10 +1,10 @@
 import fsps
 from sedpy import observate
-from read_images import unconver_read_filters
+from read_images import uncover_read_filters
 import time
 
 def make_mock_images():
-    _, sedpy_filts = unconver_read_filters()
+    _, sedpy_filts = uncover_read_filters()
 
     t0 = time.time()
     print('Generating stellar pop...')
