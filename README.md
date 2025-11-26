@@ -54,6 +54,11 @@ It is unclear to me which will be more productive between pixel normalization an
 
 I have tried 6 different methods here, and again it is unclear to me which is most effective. Lots of pros and cons to all of them. In particular, I think determining how to figure out the required number of clusters is really important. Most of the methods require specifying the number of clusters as an input, and this would likely change from galaxy to galaxy
 
+
+# Composite SEDs
+
+This is one of the spots where I left off - currently, I'm generating composite SEDs for each of the clusters and then viewing their similarities for just one clustering method (kmeans). I was just starting to get this implemented when I stopped working on this project, so there is much more to explore with evaluating the composite SEDs for a variety of methods (should be easy to run, just haven't done it yet).
+
 # Next Steps
 
 My suggestions for next steps would be to find a galaxy that has very clear clumps and to run these methods and that. So far, I have been working with relatively uniform galaxies - I think taking an extreme example would be useful
